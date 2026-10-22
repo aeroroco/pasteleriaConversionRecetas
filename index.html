@@ -457,8 +457,31 @@
       calculate();
     }
 
-    document.querySelectorAll('input[name="originalShape"], input[name="newShape"]')
-      .forEach(radio => radio.addEventListener("change", renderAll));
+document
+  .querySelectorAll('input[name="originalShape"]')
+  .forEach(radio => {
+    radio.addEventListener("change", () => {
+      renderShapeFields(
+        originalFields,
+        selectedShape("originalShape"),
+        "original"
+      );
+      calculate();
+    });
+  });
+
+document
+  .querySelectorAll('input[name="newShape"]')
+  .forEach(radio => {
+    radio.addEventListener("change", () => {
+      renderShapeFields(
+        newFields,
+        selectedShape("newShape"),
+        "new"
+      );
+      calculate();
+    });
+  });    
 
     ingredientEl.addEventListener("input", calculate);
 
