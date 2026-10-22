@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f3ee">
+  <title>Conversor de moldes para recetas</title>
+
+  <style>
+    :root {
+      --fondo: #f7f3ee;
+      --tarjeta: #ffffff;
+      --texto: #2c2926;
+      --suave: #736d67;
+      --borde: #ded7d0;
+      --acento: #7d5a50;
+      --acento-suave: #f0e5df;
+      --error: #9b2c2c;
+      --sombra: 0 12px 35px rgba(48, 40, 35, .08);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--fondo);
+      color: var(--texto);
+    }
+
+    main {
+      width: min(760px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 36px 0 56px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.8rem, 5vw, 2.6rem);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+    }
+
+    header p {
+      margin: 0 auto;
+      max-width: 560px;
+      color: var(--suave);
+      line-height: 1.5;
+    }
+
+    .card {
+      background: var(--tarjeta);
+      border: 1px solid var(--borde);
+      border-radius: 20px;
+      box-shadow: var(--sombra);
+      padding: 22px;
+      margin-bottom: 16px;
+    }
+
+    .card h2 {
+      margin: 0 0 16px;
+      font-size: 1.08rem;
+    }
+
+    .shape-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .shape-toggle input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .shape-toggle label {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 48px;
+      border: 1px solid var(--borde);
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 650;
+      user-select: none;
+      transition: .15s ease;
+    }
+
+    .shape-toggle input:checked + label {
+      background: var(--acento-suave);
+      border-color: var(--acento);
+      color: var(--acento);
+    }
+
+    .fields {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    .field label {
+      font-size: .92rem;
+      font-weight: 650;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      min-height: 50px;
+      border: 1px solid var(--borde);
+      border-radius: 12px;
+      padding: 11px 48px 11px 13px;
+      font: inherit;
+      font-size: 1.05rem;
+      color: var(--texto);
+      background: #fff;
+      outline: none;
+      transition: .15s ease;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--acento);
+      box-shadow: 0 0 0 3px rgba(125, 90, 80, .12);
+    }
+
+    .unit {
+      position: absolute;
+      right: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--suave);
+      pointer-events: none;
+    }
+
+    .result-card {
+      text-align: center;
+      background: #fffaf7;
+    }
+
+    .factor-label,
+    .result-label {
+      color: var(--suave);
+      font-size: .9rem;
+      font-weight: 650;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    #factor {
+      margin: 5px 0 20px;
+      font-size: clamp(2rem, 8vw, 3.4rem);
+      font-weight: 800;
+      color: var(--acento);
+      letter-spacing: -0.04em;
+    }
+
+    .ingredient-row {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: end;
+      gap: 12px;
+      margin-top: 14px;
+      text-align: left;
+    }
+
+    .arrow {
+      padding-bottom: 14px;
+      color: var(--suave);
+      font-size: 1.4rem;
+    }
+
+    .output {
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      padding: 11px 13px;
+      background: var(--acento-suave);
+      border: 1px solid #dbc9c0;
+      border-radius: 12px;
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--acento);
+      overflow-wrap: anywhere;
+    }
+
+    .helper {
+      margin: 15px 0 0;
+      color: var(--suave);
+      font-size: .88rem;
+      line-height: 1.45;
+    }
+
+    .error {
+      min-height: 1.3em;
+      margin: 10px 0 0;
+      color: var(--error);
+      font-size: .9rem;
+      text-align: center;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--suave);
+      font-size: .82rem;
+      line-height: 1.45;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 560px) {
+      main { padding-top: 24px; }
+      .card { padding: 18px; border-radius: 17px; }
+      .fields { grid-template-columns: 1fr; }
+      .ingredient-row {
+        grid-template-columns: 1fr;
+        align-items: stretch;
+      }
+      .arrow {
+        text-align: center;
+        padding: 0;
+        transform: rotate(90deg);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <header>
+      <h1>Conversor de moldes</h1>
+      <p>
+        Calcula cuánto debe cambiar una cantidad de tu receta al usar un molde
+        de otro tamaño o forma.
+      </p>
+    </header>
+
+    <section class="card">
+      <h2>1. Molde de la receta original</h2>
+
+      <div class="shape-toggle">
+        <input type="radio" name="originalShape" id="originalCircle" value="circle" checked>
+        <label for="originalCircle">○ Circular</label>
+
+        <input type="radio" name="originalShape" id="originalRect" value="rect">
+        <label for="originalRect">▭ Rectangular</label>
+      </div>
+
+      <div id="originalFields" class="fields"></div>
+    </section>
+
+    <section class="card">
+      <h2>2. Molde que vas a usar</h2>
+
+      <div class="shape-toggle">
+        <input type="radio" name="newShape" id="newCircle" value="circle">
+        <label for="newCircle">○ Circular</label>
+
+        <input type="radio" name="newShape" id="newRect" value="rect" checked>
+        <label for="newRect">▭ Rectangular</label>
+      </div>
+
+      <div id="newFields" class="fields"></div>
+    </section>
+
+    <section class="card result-card">
+      <div class="factor-label">Factor de conversión</div>
+      <div id="factor">—</div>
+
+      <div class="ingredient-row">
+        <div class="field">
+          <label for="ingredient">Cantidad en la receta</label>
+          <input
+            id="ingredient"
+            type="text"
+            inputmode="decimal"
+            autocomplete="off"
+            placeholder="Ej.: 300"
+          >
+        </div>
+
+        <div class="arrow">→</div>
+
+        <div class="field">
+          <label>Nueva cantidad</label>
+          <div id="finalAmount" class="output" aria-live="polite">—</div>
+        </div>
+      </div>
+
+      <p class="helper">
+        La unidad no cambia: si ingresas gramos, el resultado está en gramos;
+        si ingresas mililitros, queda en mililitros.
+      </p>
+
+      <div id="error" class="error" aria-live="polite"></div>
+    </section>
+
+    <footer>
+      El cálculo compara el área de ambos moldes y supone una altura de llenado similar.
+    </footer>
+  </main>
+
+  <script>
+    const originalFields = document.getElementById("originalFields");
+    const newFields = document.getElementById("newFields");
+    const factorEl = document.getElementById("factor");
+    const ingredientEl = document.getElementById("ingredient");
+    const finalAmountEl = document.getElementById("finalAmount");
+    const errorEl = document.getElementById("error");
+
+    function parseNumber(value) {
+      if (typeof value !== "string") return NaN;
+
+      const cleaned = value
+        .trim()
+        .replace(/\s+/g, "")
+        .replace(",", ".");
+
+      return Number(cleaned);
+    }
+
+    function formatNumber(value, maxDecimals = 2) {
+      if (!Number.isFinite(value)) return "—";
+
+      return new Intl.NumberFormat("es-CL", {
+        maximumFractionDigits: maxDecimals
+      }).format(value);
+    }
+
+    function fieldHTML(id, label, placeholder) {
+      return `
+        <div class="field">
+          <label for="${id}">${label}</label>
+          <div class="input-wrap">
+            <input
+              id="${id}"
+              type="text"
+              inputmode="decimal"
+              autocomplete="off"
+              placeholder="${placeholder}"
+            >
+            <span class="unit">cm</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderShapeFields(container, shape, prefix) {
+      if (shape === "circle") {
+        container.innerHTML =
+          fieldHTML(`${prefix}Diameter`, "Diámetro", "Ej.: 20");
+      } else {
+        container.innerHTML =
+          fieldHTML(`${prefix}Width`, "Ancho", "Ej.: 20") +
+          fieldHTML(`${prefix}Length`, "Largo", "Ej.: 25");
+      }
+
+      container.querySelectorAll("input").forEach(input => {
+        input.addEventListener("input", calculate);
+      });
+    }
+
+    function selectedShape(groupName) {
+      return document.querySelector(`input[name="${groupName}"]:checked`).value;
+    }
+
+    function areaFor(shape, prefix) {
+      if (shape === "circle") {
+        const diameter = parseNumber(
+          document.getElementById(`${prefix}Diameter`)?.value ?? ""
+        );
+
+        if (!(diameter > 0)) return NaN;
+
+        return Math.PI * Math.pow(diameter / 2, 2);
+      }
+
+      const width = parseNumber(
+        document.getElementById(`${prefix}Width`)?.value ?? ""
+      );
+
+      const length = parseNumber(
+        document.getElementById(`${prefix}Length`)?.value ?? ""
+      );
+
+      if (!(width > 0) || !(length > 0)) return NaN;
+
+      return width * length;
+    }
+
+    function calculate() {
+      errorEl.textContent = "";
+
+      const originalShape = selectedShape("originalShape");
+      const newShape = selectedShape("newShape");
+
+      const originalArea = areaFor(originalShape, "original");
+      const newArea = areaFor(newShape, "new");
+
+      if (!Number.isFinite(originalArea) || !Number.isFinite(newArea)) {
+        factorEl.textContent = "—";
+        finalAmountEl.textContent = "—";
+        return;
+      }
+
+      const factor = newArea / originalArea;
+      factorEl.textContent = "× " + formatNumber(factor, 3);
+
+      const ingredient = parseNumber(ingredientEl.value);
+
+      if (ingredientEl.value.trim() === "") {
+        finalAmountEl.textContent = "—";
+        return;
+      }
+
+      if (!Number.isFinite(ingredient) || ingredient < 0) {
+        finalAmountEl.textContent = "—";
+        errorEl.textContent = "Ingresa una cantidad válida.";
+        return;
+      }
+
+      finalAmountEl.textContent = formatNumber(ingredient * factor, 2);
+    }
+
+    function renderAll() {
+      renderShapeFields(
+        originalFields,
+        selectedShape("originalShape"),
+        "original"
+      );
+
+      renderShapeFields(
+        newFields,
+        selectedShape("newShape"),
+        "new"
+      );
+
+      calculate();
+    }
+
+    document.querySelectorAll('input[name="originalShape"], input[name="newShape"]')
+      .forEach(radio => radio.addEventListener("change", renderAll));
+
+    ingredientEl.addEventListener("input", calculate);
+
+    renderAll();
+  </script>
+</body>
+</html>
