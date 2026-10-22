@@ -2,6 +2,7 @@
 <html lang="es">
 
 <head>
+
   <meta charset="utf-8">
 
   <meta
@@ -57,9 +58,11 @@
 
       min-height: 100vh;
 
-      background: var(--fondo);
+      background:
+        var(--fondo);
 
-      color: var(--texto);
+      color:
+        var(--texto);
     }
 
 
@@ -81,9 +84,11 @@
 
     header {
 
-      text-align: center;
+      text-align:
+        center;
 
-      margin-bottom: 24px;
+      margin-bottom:
+        24px;
     }
 
 
@@ -99,11 +104,14 @@
           2.6rem
         );
 
-      line-height: 1.08;
+      line-height:
+        1.08;
 
-      letter-spacing: -0.03em;
+      letter-spacing:
+        -0.03em;
 
-      color: var(--acento);
+      color:
+        var(--acento);
     }
 
 
@@ -144,7 +152,8 @@
       margin-bottom:
         16px;
 
-      overflow: hidden;
+      overflow:
+        hidden;
     }
 
 
@@ -160,7 +169,8 @@
 
     .shape-toggle {
 
-      display: grid;
+      display:
+        grid;
 
       grid-template-columns:
         repeat(
@@ -333,8 +343,7 @@
         12px;
 
       padding:
-        11px 48px
-        11px 13px;
+        11px 48px 11px 13px;
 
       font:
         inherit;
@@ -394,6 +403,20 @@
     }
 
 
+    .height-area {
+
+      margin-top:
+        14px;
+
+      padding-top:
+        14px;
+
+      border-top:
+        1px dashed
+        var(--borde);
+    }
+
+
     .result-card {
 
       text-align:
@@ -404,8 +427,7 @@
     }
 
 
-    .factor-label,
-    .result-label {
+    .factor-label {
 
       color:
         var(--suave);
@@ -588,7 +610,6 @@
     }
 
 
-
     @media (max-width: 560px) {
 
       main {
@@ -657,9 +678,8 @@
       </h1>
 
       <p>
-        Calcula cuánto debe cambiar una cantidad
-        de tu receta al usar un molde
-        de otro tamaño o forma.
+        Adapta las cantidades de tu receta
+        al tamaño y altura del nuevo molde.
       </p>
 
     </header>
@@ -674,7 +694,6 @@
 
 
       <div class="shape-toggle">
-
 
         <input
           type="radio"
@@ -700,7 +719,6 @@
           ▭ Rectangular
         </label>
 
-
       </div>
 
 
@@ -709,6 +727,34 @@
         class="fields"
       ></div>
 
+
+      <div class="height-area">
+
+        <div class="field">
+
+          <label for="originalHeight">
+            Altura del molde
+          </label>
+
+          <div class="input-wrap">
+
+            <input
+              id="originalHeight"
+              type="text"
+              inputmode="decimal"
+              autocomplete="off"
+              placeholder="Ej.: 7"
+            >
+
+            <span class="unit">
+              cm
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
 
     </section>
 
@@ -722,7 +768,6 @@
 
 
       <div class="shape-toggle">
-
 
         <input
           type="radio"
@@ -748,7 +793,6 @@
           ▭ Rectangular
         </label>
 
-
       </div>
 
 
@@ -758,12 +802,39 @@
       ></div>
 
 
+      <div class="height-area">
+
+        <div class="field">
+
+          <label for="newHeight">
+            Altura del molde
+          </label>
+
+          <div class="input-wrap">
+
+            <input
+              id="newHeight"
+              type="text"
+              inputmode="decimal"
+              autocomplete="off"
+              placeholder="Ej.: 10"
+            >
+
+            <span class="unit">
+              cm
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
     </section>
 
 
 
     <section class="card result-card">
-
 
       <div class="factor-label">
         Factor de conversión
@@ -773,7 +844,6 @@
       <div id="factor">
         —
       </div>
-
 
 
       <div class="ingredient-row">
@@ -796,11 +866,9 @@
         </div>
 
 
-
         <div class="arrow">
           →
         </div>
-
 
 
         <div class="field">
@@ -823,7 +891,6 @@
       </div>
 
 
-
       <p class="helper">
 
         La unidad no cambia:
@@ -833,7 +900,6 @@
         queda en mililitros.
 
       </p>
-
 
 
       <div
@@ -849,8 +915,9 @@
 
     <footer>
 
-      El cálculo compara el área de ambos moldes
-      y supone una altura de llenado similar.
+      El cálculo compara el volumen útil
+      de ambos moldes:
+      superficie × altura.
 
     </footer>
 
@@ -871,6 +938,18 @@
     const newFields =
       document.getElementById(
         "newFields"
+      );
+
+
+    const originalHeightEl =
+      document.getElementById(
+        "originalHeight"
+      );
+
+
+    const newHeightEl =
+      document.getElementById(
+        "newHeight"
       );
 
 
@@ -900,16 +979,12 @@
 
 
     /*
-      Aquí guardamos temporalmente
-      lo que la persona ha escrito.
+      Se guardan los valores
+      de cada forma de molde.
 
-      Así, cambiar un molde no borra
-      los datos del otro.
-
-      Además, si se cambia de
-      circular a rectangular
-      y luego se vuelve,
-      el valor anterior permanece.
+      Esto permite cambiar
+      circular ↔ rectangular
+      sin perder lo que se escribió.
     */
 
     const moldValues = {
@@ -1254,7 +1329,6 @@
         );
 
 
-
       const length =
         parseNumber(
 
@@ -1265,7 +1339,6 @@
             ?.value ?? ""
 
         );
-
 
 
       if (
@@ -1280,6 +1353,44 @@
 
       return (
         width * length
+      );
+
+    }
+
+
+
+    function volumeFor(
+      shape,
+      prefix,
+      heightElement
+    ) {
+
+
+      const area =
+        areaFor(
+          shape,
+          prefix
+        );
+
+
+      const height =
+        parseNumber(
+          heightElement.value
+        );
+
+
+      if (
+        !Number.isFinite(area) ||
+        !(height > 0)
+      ) {
+
+        return NaN;
+
+      }
+
+
+      return (
+        area * height
       );
 
     }
@@ -1307,27 +1418,29 @@
 
 
 
-      const originalArea =
-        areaFor(
+      const originalVolume =
+        volumeFor(
           originalShape,
-          "original"
+          "original",
+          originalHeightEl
         );
 
 
-      const newArea =
-        areaFor(
+      const newVolume =
+        volumeFor(
           newShape,
-          "new"
+          "new",
+          newHeightEl
         );
 
 
 
       if (
         !Number.isFinite(
-          originalArea
+          originalVolume
         ) ||
         !Number.isFinite(
-          newArea
+          newVolume
         )
       ) {
 
@@ -1347,8 +1460,8 @@
 
 
       const factor =
-        newArea /
-        originalArea;
+        newVolume /
+        originalVolume;
 
 
 
@@ -1419,10 +1532,10 @@
 
 
     /*
-      Cambio del molde ORIGINAL.
-
-      Sólo reconstruimos
-      el molde original.
+      Si cambia el tipo de
+      molde original,
+      sólo se reconstruye
+      esa sección.
     */
 
     document
@@ -1463,13 +1576,9 @@
 
 
     /*
-      Cambio del molde NUEVO.
-
-      Sólo reconstruimos
-      el molde nuevo.
-
-      El molde original
-      permanece intacto.
+      Si cambia el tipo
+      del molde nuevo,
+      sólo cambia esa sección.
     */
 
     document
@@ -1509,6 +1618,25 @@
 
 
 
+    /*
+      Alturas independientes.
+    */
+
+    originalHeightEl
+      .addEventListener(
+        "input",
+        calculate
+      );
+
+
+    newHeightEl
+      .addEventListener(
+        "input",
+        calculate
+      );
+
+
+
     ingredientEl
       .addEventListener(
         "input",
@@ -1518,8 +1646,7 @@
 
 
     /*
-      Construcción inicial
-      de ambos moldes.
+      Construcción inicial.
     */
 
     renderShapeFields(
